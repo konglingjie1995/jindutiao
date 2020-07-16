@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
+<link href="../static/layui/css/layui.css" th:href="@{/layui/css/layui.css}" rel="stylesheet">
+<head>
+    <title>hello</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body>
+<div class="layui-form-item">
+    <div class="layui-input-block">
+        <div class="layui-progress layui-progress-big" lay-showPercent="yes" lay-filter="executeprogress" style="width: 80%;">
+            <div id="percentdiv" class="layui-progress-bar layui-bg-green" lay-percent="0%"></div>
+        </div>
+    </div>
+</div>
+<div class="layui-form-item">
+    <div class="layui-input-block">
+        <button class="layui-btn" lay-submit="" id="submitbtn" lay-filter="demo1">执行</button>
+    </div>
+</div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<SCRIPT ype="text/javascript" src="/layui/layui.js" ></SCRIPT>
+<SCRIPT>
+    var element;
+    layui.use('element', function(){
+        element = layui.element;
+    });
+    //定义定时器
+    var timer;
+    //开始执行任务
+    $('#submitbtn').click(function(){
+        //进度条设置为百分之0
+        element.progress('executeprogress', '0%');
+        //轮询获取进度条数据
+        getProcessvalue();
+        //请求后台
+        $.post('/execute',function(data){
+            //执行完成进度条设置为百分之百
+            element.progress('executeprogress', '100%');
+            //关闭定时器
+            clearInterval(timer);
+        });
+    });
+    //轮询请求进度数据
+    function getProcessvalue(){
+        //1秒请求一次进度条的数据
+        timer = setInterval(function () {
+            $.post('/getprocess',function(data){
+                //更新进度条
+                element.progress('executeprogress', data+'%');
+            });
+        }, 1000);
+    }
+</SCRIPT>
+</html>
